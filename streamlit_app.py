@@ -1,5 +1,9 @@
 import streamlit as st
 from openai import OpenAI
+import pandas as pd
+from docx import Document
+import PyPDF2
+import io
 
 # Show title and description.
 st.title("📄 Document question answering")
@@ -20,34 +24,46 @@ else:
     client = OpenAI(api_key=openai_api_key)
 
     # Let the user upload a file via `st.file_uploader`.
-    uploaded_file = st.file_uploader(
-        "Upload a document (.txt or .md)", type=("txt", "md")
-    )
+uploaded_file = st.file_uploader(
+    "Upload a document (.txt, .md, .doc, .docx, .xls, .xlsx, .pdf)",
+    type=("txt", "md", "doc", "docx", "xls", "xlsx", "pdf")
+)
 
-    # Ask the user for a question via `st.text_area`.
-    question = st.text_area(
-        "Now ask a question about the document!",
-        placeholder="Can you give me a short summary?",
-        disabled=not uploaded_file,
-    )
+question = st.text_area(
+    "Now ask a question about the document!",
+    placeholder="Can you give me a short summary?",
+    disabled=not uploaded_file,
+)
 
-    if uploaded_file and question:
-
-        # Process the uploaded file and question.
+if uploaded_file and question:
+    if uploaded_file.name.endswith(".txt") or uploaded_file.name.endswith(".md"):
         document = uploaded_file.read().decode()
-        messages = [
-            {
-                "role": "user",
-                "content": f"Here's a document: {document} \n\n---\n\n {question}",
-            }
-        ]
 
-        # Generate an answer using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            stream=True,
-        )
+    elif uploaded_file.name.endswith(".doc") or uploaded_file.name.endswith(".docx"):
+        doc = Document(uploaded_file)
+        document = "\n".join([para.text for para in doc.paragraphs])
 
-        # Stream the response to the app using `st.write_stream`.
-        st.write_stream(stream)
+    elif uploaded_file.name.endswith(".xls") or uploaded_file.name.endswith(".xlsx"):
+        df = pd.read_excel(uploaded_file)
+        document = df.to_string()
+
+    elif uploaded_file.name.endswith(".pdf"):
+        pdf_reader = PyPDF2.PdfReader(uploaded_file)
+        document = ""
+        for page in pdf_reader.pages:
+            document += page.extract_text()
+
+    messages = [
+        {
+            "role": "user",
+            "content": f"Here's a document: {document} \n\n---\n\n {question}",
+        }
+    ]
+
+    stream = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        stream=True,
+    )
+
+    st.write_stream(stream)
