@@ -24,10 +24,10 @@ else:
     # Create an OpenAI client.
     client = OpenAI(api_key=openai_api_key)
 
-    # Let the user upload a file via `st.file_uploader`.
-uploaded_file = st.file_uploader(
-    "Upload a document (.txt, .md, .doc, .docx, .xls, .xlsx, .pdf, .pptx)",
-    type=("txt", "md", "doc", "docx", "xls", "xlsx", "pdf", "pptx")
+    # Let the user upload files via `st.file_uploader`.
+uploaded_files = st.file_uploader(
+    "Upload documents (.txt, .md, .doc, .docx, .xls, .xlsx, .pdf, .pptx)",
+    type=("txt", "md", "doc", "docx", "xls", "xlsx", "pdf", "pptx"),accept_multiple_files=True
 )
 
 question = st.text_area(
@@ -36,36 +36,37 @@ question = st.text_area(
     disabled=not uploaded_file,
 )
 
-if uploaded_file and question:
-    if uploaded_file.name.endswith(".txt") or uploaded_file.name.endswith(".md"):
-        document = uploaded_file.read().decode()
+if uploaded_files and question:
 
-    elif uploaded_file.name.endswith(".doc") or uploaded_file.name.endswith(".docx"):
-        doc = Document(uploaded_file)
-        document = "\n".join([para.text for para in doc.paragraphs])
+    combined_document = ""
+    for uploaded_file in uploaded_files:
+        if uploaded_file.name.endswith(".txt") or uploaded_file.name.endswith(".md"):
+            combined_document += uploaded_file.read().decode() + "\n"
 
-    elif uploaded_file.name.endswith(".xls") or uploaded_file.name.endswith(".xlsx"):
-        df = pd.read_excel(uploaded_file)
-        document = df.to_string()
+        elif uploaded_file.name.endswith(".doc") or uploaded_file.name.endswith(".docx"):
+            doc = Document(uploaded_file)
+            combined_document += "\n".join([para.text for para in doc.paragraphs]) + "\n"
 
-    elif uploaded_file.name.endswith(".pdf"):
-        pdf_reader = PyPDF2.PdfReader(uploaded_file)
-        document = ""
-        for page in pdf_reader.pages:
-            document += page.extract_text()
+        elif uploaded_file.name.endswith(".xls") or uploaded_file.name.endswith(".xlsx"):
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+            combined_document += df.to_string() + "\n"
 
-    elif uploaded_file.name.endswith(".pptx"):
-        presentation = Presentation(uploaded_file)
-        document = ""
-        for slide in presentation.slides:
-            for shape in slide.shapes:
-                if hasattr(shape, "text"):
-                    document += shape.text + "\n"
+        elif uploaded_file.name.endswith(".pdf"):
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            for page in pdf_reader.pages:
+                combined_document += page.extract_text() + "\n"
+
+        elif uploaded_file.name.endswith(".pptx"):
+            presentation = Presentation(uploaded_file)
+            for slide in presentation.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        combined_document += shape.text + "\n"
 
     messages = [
         {
             "role": "user",
-            "content": f"Here's a document: {document} \n\n---\n\n {question}",
+            "content": f"Here are the documents: {combined_document} \n\n---\n\n {question}",
         }
     ]
 
@@ -76,3 +77,6 @@ if uploaded_file and question:
     )
 
     st.write_stream(stream)
+
+
+
