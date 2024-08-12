@@ -34,6 +34,7 @@ question = st.text_area(
     "Now ask a question about the document!",
     placeholder="Can you give me a short summary?",
     disabled=not uploaded_files,
+    value="Summarize"
 )
 
 if uploaded_files and question:
