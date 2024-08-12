@@ -7,7 +7,7 @@ import io
 from pptx import Presentation
 
 # Show title and description.
-st.title("📄 Document question answering")
+st.title("📄 Chat with Documents")
 st.write(
     "Upload one or more documenta below and ask a questions – GPT will answer! "
     "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
