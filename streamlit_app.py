@@ -9,7 +9,7 @@ from pptx import Presentation
 # Show title and description.
 st.title("📄 Document question answering")
 st.write(
-    "Upload a document below and ask a question about it – GPT will answer! "
+    "Upload one or more documenta below and ask a questions – GPT will answer! "
     "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
 )
 
@@ -31,7 +31,7 @@ uploaded_files = st.file_uploader(
 )
 
 question = st.text_area(
-    "Now ask a question about the document!",
+    "Now ask a question:",
     placeholder="Can you give me a short summary?",
     disabled=not uploaded_files,
     value="Summarize"
