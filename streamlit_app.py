@@ -70,13 +70,15 @@ if uploaded_files and question:
         }
     ]
 
-    stream = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        stream=True,
-    )
+    try:
+        stream = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            stream=True,
+        )
+    
+        st.write_stream(stream)
 
-    st.write_stream(stream)
-
-
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
 
