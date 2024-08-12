@@ -1,8 +1,16 @@
-# 📄 Document question answering template
+# 📄 Document question answering app
 
 A simple Streamlit app that answers questions about an uploaded document via OpenAI's GPT-3.5.
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://document-question-answering-template.streamlit.app/)
+
+Started with the Template and just added the possibility to upload Files in the formats DOC, DOCX, XLS, XLSX, PDF, PPTX
+
+
+### Test the Onlineversion:
+https://document-chatter.streamlit.app
+
+
 
 ### How to run it on your own machine
 
