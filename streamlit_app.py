@@ -4,6 +4,7 @@ import pandas as pd
 from docx import Document
 import PyPDF2
 import io
+from pptx import Presentation
 
 # Show title and description.
 st.title("📄 Document question answering")
@@ -25,8 +26,8 @@ else:
 
     # Let the user upload a file via `st.file_uploader`.
 uploaded_file = st.file_uploader(
-    "Upload a document (.txt, .md, .doc, .docx, .xls, .xlsx, .pdf)",
-    type=("txt", "md", "doc", "docx", "xls", "xlsx", "pdf")
+    "Upload a document (.txt, .md, .doc, .docx, .xls, .xlsx, .pdf, .pptx)",
+    type=("txt", "md", "doc", "docx", "xls", "xlsx", "pdf", "pptx")
 )
 
 question = st.text_area(
@@ -52,6 +53,14 @@ if uploaded_file and question:
         document = ""
         for page in pdf_reader.pages:
             document += page.extract_text()
+
+    elif uploaded_file.name.endswith(".pptx"):
+        presentation = Presentation(uploaded_file)
+        document = ""
+        for slide in presentation.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    document += shape.text + "\n"
 
     messages = [
         {
