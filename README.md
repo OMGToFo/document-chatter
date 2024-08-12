@@ -4,7 +4,7 @@ A simple Streamlit app that answers questions about an uploaded document via Ope
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://document-question-answering-template.streamlit.app/)
 
-Started with the Template and just added the possibility to upload Files in the formats DOC, DOCX, XLS, XLSX, PDF, PPTX
+I started with the Template and just added the possibility to upload multiple files in the formats DOC, DOCX, XLS, XLSX, PDF, PPTX
 
 
 ### Test the Onlineversion:
